@@ -68,6 +68,35 @@ public class No64 {
 
     }
 
+    public int minPathSumBySQL(int[][] grid) {
+        //取数组的列
+        int n = grid[0].length;
+        //取数组的行
+        int m = grid.length;
+        //令数组sum=grid
+        int[][] sum = new int[m][n];
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                sum[i][j] = grid[i][j];
+        //一共要走多少步
+        int step = m - 1 + n - 1;
+
+        for (int i = 1; i <= step; i++) {
+            for (int j = 0; j <= i; j++) {
+                if ((j > 0 && j < m) && ((i - j) > 0 && (i - j) < n))
+                    sum[j][i - j] += sum[j - 1][i - j] < sum[j][i - j - 1] ? sum[j - 1][i - j] : sum[j][i - j - 1];
+                else if ((i - j) == 0 && j < m)
+                    //如果在第一列
+                    sum[j][i - j] += sum[j - 1][i - j];
+                else if (j == 0 && (i - j) < n)
+                    //如果在第一行
+                    sum[j][i - j] += sum[j][i - j - 1];
+            }
+        }
+        return sum[m - 1][n - 1];
+    }
+
+
     private int getSmallestSum(int[][] grid, int x, int y) {
 
         //如果 x,y 已经到了右下角
