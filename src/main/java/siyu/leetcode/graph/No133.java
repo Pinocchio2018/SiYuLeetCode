@@ -1,9 +1,6 @@
 package siyu.leetcode.graph;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class No133 {
 
@@ -44,36 +41,51 @@ public class No133 {
 
         Node clonedStartNode = new Node(node.val);
 
-        for (Node oriNeighbor : node.neighbors) {
+        Set<Node> alreadyClonedNodes = new HashSet<>();
+        Set<Node> alreadyClonedOriNodes = new HashSet<>();
 
-            Node nextClonedNeighbor = new Node(oriNeighbor.val);
 
-            doCloneGraph(clonedStartNode, nextClonedNeighbor, oriNeighbor);
-        }
+        alreadyClonedNodes.add(clonedStartNode);
+        alreadyClonedOriNodes.add(node);
+        doCloneGraph(alreadyClonedNodes, alreadyClonedOriNodes, clonedStartNode, node);
 
 
         return clonedStartNode;
 
     }
 
-    private void doCloneGraph(Node lastNode, Node cloningNode, Node cloningOriNode) {
-        if (cloningOriNode.neighbors.isEmpty()) {
-            cloningNode.neighbors.add(lastNode);
-            return;
-        }
+    private void doCloneGraph(Set<Node> alreadyClonedNodes, Set<Node> alreadyClonedOriNodes, Node cloningNode, Node cloningOriNode) {
 
         for (Node oriNeighBor : cloningOriNode.neighbors) {
-            if (lastNode.val == oriNeighBor.val) {
-                cloningNode.neighbors.add(lastNode);
+            if (alreadyClonedOriNodes.contains(oriNeighBor)) {
+                Node clonedNode = alreadyClonedNodes.stream().filter(item -> item.val == oriNeighBor.val).findFirst().get();
+
+                if (!clonedNode.neighbors.contains(cloningNode)) {
+                    clonedNode.neighbors.add(cloningNode);
+                }
+                if (!cloningNode.neighbors.contains(clonedNode)) {
+                    cloningNode.neighbors.add(clonedNode);
+                }
                 continue;
             }
-             Node nextClonedNeighbor = new Node(oriNeighBor.val);
-            cloningNode.neighbors.add(nextClonedNeighbor);
-            doCloneGraph(cloningNode, nextClonedNeighbor, oriNeighBor);
+
+
+            Node nextClonedNeighbor = new Node(oriNeighBor.val);
+
+            nextClonedNeighbor.neighbors.add(cloningNode);
+
+            if (!cloningNode.neighbors.contains(nextClonedNeighbor)) {
+                cloningNode.neighbors.add(nextClonedNeighbor);
+            }
+            alreadyClonedNodes.add(nextClonedNeighbor);
+            alreadyClonedOriNodes.add(oriNeighBor);
+
+            doCloneGraph(alreadyClonedNodes, alreadyClonedOriNodes, nextClonedNeighbor, oriNeighBor);
 
         }
 
     }
+
 
     static class Node {
         public int val;
